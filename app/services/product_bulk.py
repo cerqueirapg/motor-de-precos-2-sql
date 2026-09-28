@@ -2,9 +2,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.domain_models import (
-    ProductModel,  # Ajuste conforme o nome do seu Model SQLAlchemy
-)
+from app.models.domain_models import Product as ProductModel
 
 
 async def bulk_insert_products(
