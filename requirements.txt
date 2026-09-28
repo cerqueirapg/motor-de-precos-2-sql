@@ -9,9 +9,10 @@ python-multipart
 httpx
 
 # Banco de Dados & Migrações
-sqlalchemy
+sqlalchemy>=2.0.0
 alembic
 asyncpg  # ou aiosqlite/psycopg2-binary conforme o SGBD utilizado
+aiosqlite
 
 # Processamento de Planilhas e Documentos
 pandas
