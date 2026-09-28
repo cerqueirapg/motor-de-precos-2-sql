@@ -1,12 +1,13 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite+aiosqlite:///./test.db"  # Ou postgresql+asyncpg://user:pass@localhost/db
+    PROJECT_NAME: str = "Motor de Preços 2.0"
+    DEBUG: bool = False  # <--- Adicione esta linha
+    DATABASE_URL: str = "sqlite+aiosqlite:///./sql_app.db"
 
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
-    )
+    class Config:
+        env_file = ".env"
 
 
 settings = Settings()

@@ -1,9 +1,18 @@
 from typing import Annotated
 
+from app.repositories.sql_product_repository import SQLProductRepository
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.database import get_db_session
 from app.repositories.excel_repository import ExcelRepository
 from app.repositories.product_repository import ProductRepository
+
+
+async def get_product_repository(
+    db: AsyncSession = Depends(get_db_session),
+) -> SQLProductRepository:
+    return SQLProductRepository(db)
 
 
 def get_excel_repository() -> ExcelRepository:
