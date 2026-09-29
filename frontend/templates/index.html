@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motor de Preços 2.0</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Motor de Preços 2.0</h1>
+            <p>Calculadora e Gestão Assíncrona de Precificação</p>
+        </header>
+
+        <main>
+            <!-- Bloco de Upload de Planilha / Form de Cálculo -->
+            <section class="card">
+                <h2>Cálculo de Preço</h2>
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="fileInput">Selecione a Planilha de Preços (.xlsx):</label>
+                        <input type="file" id="fileInput" name="file" accept=".xlsx" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Processar Planilha</button>
+                </form>
+            </section>
+
+            <!-- Indicador de Carregamento -->
+            <div id="loading" class="loading-container hidden">
+                <div class="spinner"></div>
+                <p>A processar dados e a calcular margens...</p>
+            </div>
+
+            <!-- Secção de Resultados do Upload / Processamento -->
+            <section id="resultsSection" class="card hidden">
+                <div class="card-header-actions">
+                    <h2>Resultado da Análise</h2>
+                    <div class="export-buttons">
+                        <button id="btnExportDocx" class="btn-export">Exportar DOCX</button>
+                        <button id="btnExportXlsx" class="btn-export">Exportar XLSX</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Nome</th>
+                                <th>Custo (R$)</th>
+                                <th>Menor Conc. (R$)</th>
+                                <th>Preço Sugerido (R$)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Inserido dinamicamente via script.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

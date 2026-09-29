@@ -1,62 +1,79 @@
 let dadosRelatorioAtual = [];
 
-document.getElementById("uploadForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+document.addEventListener("DOMContentLoaded", () => {
+    const uploadForm = document.getElementById("uploadForm");
+    const btnDocx = document.getElementById("btnExportDocx");
+    const btnXlsx = document.getElementById("btnExportXlsx");
 
-    const fileInput = document.getElementById("fileInput");
-    const loading = document.getElementById("loading");
-    const resultsSection = document.getElementById("resultsSection");
+    if (uploadForm) {
+        uploadForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-    if (!fileInput.files.length) return;
+            const fileInput = document.getElementById("fileInput");
+            const loading = document.getElementById("loading");
+            const resultsSection = document.getElementById("resultsSection");
 
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
+            if (!fileInput || !fileInput.files.length) return;
 
-    loading.classList.remove("hidden");
-    resultsSection.classList.add("hidden");
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
 
-    try {
-        const response = await fetch("/api/upload/excel", {
-            method: "POST",
-            body: formData,
+            if (loading) loading.classList.remove("hidden");
+            if (resultsSection) resultsSection.classList.add("hidden");
+
+            try {
+                const response = await fetch("/api/upload/excel", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const textResponse = await response.text();
+                let result;
+
+                try {
+                    result = JSON.parse(textResponse);
+                } catch (jsonErr) {
+                    throw new Error(
+                        `Resposta inválida do servidor (Status ${response.status}). Conteúdo: "${textResponse}"`
+                    );
+                }
+
+                if (!response.ok) {
+                    throw new Error(
+                        result.detail || `Erro ${response.status} ao processar a planilha.`
+                    );
+                }
+
+                if (!result.data || !Array.isArray(result.data)) {
+                    throw new Error(
+                        "A resposta do servidor não contém a lista de dados esperada."
+                    );
+                }
+
+                dadosRelatorioAtual = result.data;
+                renderTable(dadosRelatorioAtual);
+                if (resultsSection) resultsSection.classList.remove("hidden");
+            } catch (err) {
+                alert(`Falha no upload: ${err.message}`);
+            } finally {
+                if (loading) loading.classList.add("hidden");
+            }
         });
+    }
 
-        const textResponse = await response.text();
-        let result;
+    if (btnDocx) {
+        btnDocx.onclick = () => exportarRelatorio("export-docx", "Relatorio_Comparativo_Precos.docx");
+    }
 
-        try {
-            result = JSON.parse(textResponse);
-        } catch (jsonErr) {
-            throw new Error(
-                `Resposta inválida do servidor (Status ${response.status}). Conteúdo: "${textResponse}"`
-            );
-        }
-
-        if (!response.ok) {
-            throw new Error(
-                result.detail || `Erro ${response.status} ao processar a planilha.`
-            );
-        }
-
-        if (!result.data || !Array.isArray(result.data)) {
-            throw new Error(
-                "A resposta do servidor não contém a lista de dados esperada."
-            );
-        }
-
-        // Armazena no estado global para permitir exportação posterior
-        dadosRelatorioAtual = result.data;
-        renderTable(dadosRelatorioAtual);
-        resultsSection.classList.remove("hidden");
-    } catch (err) {
-        alert(`Falha no upload: ${err.message}`);
-    } finally {
-        loading.classList.add("hidden");
+    if (btnXlsx) {
+        btnXlsx.onclick = () => exportarRelatorio("export-xlsx", "Analise_Comparativa_Precos.xlsx");
     }
 });
 
 function renderTable(data) {
     const tableBody = document.getElementById("tableBody");
+    if (!tableBody) return;
+    
     tableBody.innerHTML = "";
 
     data.forEach((item) => {
@@ -98,7 +115,6 @@ function renderTable(data) {
     });
 }
 
-// Lógica Genérica de Exportação (.docx e .xlsx)
 async function exportarRelatorio(endpoint, nomeArquivo) {
     if (!dadosRelatorioAtual || dadosRelatorioAtual.length === 0) {
         alert("Processe uma planilha antes de exportar o relatório.");
@@ -131,17 +147,3 @@ async function exportarRelatorio(endpoint, nomeArquivo) {
         alert(`Falha na exportação: ${err.message}`);
     }
 }
-
-// Garante o vínculo dos botões
-document.addEventListener("DOMContentLoaded", () => {
-    const btnDocx = document.getElementById("btnExportDocx");
-    const btnXlsx = document.getElementById("btnExportXlsx");
-
-    if (btnDocx) {
-        btnDocx.onclick = () => exportarRelatorio("export-docx", "Relatorio_Comparativo_Precos.docx");
-    }
-
-    if (btnXlsx) {
-        btnXlsx.onclick = () => exportarRelatorio("export-xlsx", "Analise_Comparativa_Precos.xlsx");
-    }
-});
